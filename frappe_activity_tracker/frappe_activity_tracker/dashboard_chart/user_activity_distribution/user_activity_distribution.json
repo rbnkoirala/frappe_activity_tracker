@@ -1,0 +1,27 @@
+{
+ "based_on": "user",
+ "chart_type": "Report",
+ "creation": "2024-01-01 00:00:00.000000",
+ "doctype": "Dashboard Chart",
+ "filters_json": "{}",
+ "group_by_type": "Sum",
+ "is_public": 1,
+ "is_standard": 1,
+ "modified": "2024-01-01 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Activity Tracker",
+ "name": "User Activity Distribution",
+ "owner": "Administrator",
+ "report_name": "Time Per User",
+ "timeseries": 0,
+ "type": "Bar",
+ "use_report_chart": 0,
+ "value_based_on": "active_hours",
+ "x_field": "user",
+ "y_axis": [
+  {
+   "color": "#29cd42",
+   "region": "active_hours"
+  }
+ ]
+}
