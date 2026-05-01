@@ -78,7 +78,7 @@ def _create_workspace() -> None:
             "name": APP_WORKSPACE,
             "label": APP_WORKSPACE,
             "module": MODULE,
-            "is_standard": 0,
+            "is_standard": 1,
             "public": 1,
             "content": "[]",
         })

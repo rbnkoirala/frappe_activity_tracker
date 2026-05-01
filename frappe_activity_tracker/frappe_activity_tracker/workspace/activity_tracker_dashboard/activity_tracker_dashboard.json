@@ -10,6 +10,7 @@
  "for_user": "",
  "icon": "bar-chart",
  "is_hidden": 0,
+ "is_standard": 1,
  "label": "Activity Tracker Dashboard",
  "modified": "2024-01-01 00:00:00.000000",
  "modified_by": "Administrator",

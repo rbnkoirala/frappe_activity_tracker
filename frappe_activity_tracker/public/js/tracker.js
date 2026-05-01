@@ -290,42 +290,50 @@
 		}
 	}
 
-	// Hook into Frappe router and capture the initial route once Frappe is ready
+	// Hook into Frappe router and capture the initial route once Frappe is ready.
+	// _initialized guards against frappe.after_ajax firing more than once
+	// (behaviour varies across Frappe versions), which would otherwise register
+	// duplicate router listeners and call onRouteChange() multiple times.
+	let _initialized = false;
+
 	if (typeof frappe !== "undefined") {
-	    frappe.after_ajax(function () {
-	        try {
-	            if (!frappe.session || !frappe.session.user) return;
+		frappe.after_ajax(function () {
+			if (_initialized) return;
+			_initialized = true;
 
-	            // Guard frappe.utils.slug and frappe.router.slug against null/undefined
-	            // workspace names (Frappe v15 workspace sidebar compat).
-	            function patchSlug(obj, key) {
-	                if (obj && typeof obj[key] === "function") {
-	                    var _orig = obj[key];
-	                    obj[key] = function (name) {
-	                        if (!name) return "";
-	                        return _orig.call(this, name);
-	                    };
-	                }
-	            }
-	            patchSlug(frappe.utils, "slug");
-	            patchSlug(frappe.router, "slug");
+			try {
+				if (!frappe.session || !frappe.session.user) return;
 
-	            // ensure router exists
-	            if (frappe.router && frappe.router.on) {
-	                frappe.router.on("change", function () {
-	                    onRouteChange();
-	                });
-	            }
+				// Guard frappe.utils.slug and frappe.router.slug against null/undefined
+				// workspace names (Frappe v15 workspace sidebar compat).
+				function patchSlug(obj, key) {
+					if (obj && typeof obj[key] === "function") {
+						var _orig = obj[key];
+						obj[key] = function (name) {
+							if (!name) return "";
+							return _orig.call(this, name);
+						};
+					}
+				}
+				patchSlug(frappe.utils, "slug");
+				patchSlug(frappe.router, "slug");
 
-	            // run once safely
-	            if (typeof onRouteChange === "function") {
-	                onRouteChange();
-	            }
+				// ensure router exists
+				if (frappe.router && frappe.router.on) {
+					frappe.router.on("change", function () {
+						onRouteChange();
+					});
+				}
 
-	        } catch (error) {
-	            console.error("Activity Tracker Error:", error);
-	        }
-	    });
+				// run once for the current route
+				if (typeof onRouteChange === "function") {
+					onRouteChange();
+				}
+
+			} catch (error) {
+				console.error("Activity Tracker Error:", error);
+			}
+		});
 	}
 
 	/* ------------------------------------------------------------------ */
