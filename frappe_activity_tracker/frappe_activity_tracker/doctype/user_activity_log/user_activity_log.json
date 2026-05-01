@@ -1,0 +1,114 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "hash",
+ "creation": "2024-01-01 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "user",
+  "session_id",
+  "route",
+  "view_type",
+  "ref_doctype",
+  "docname",
+  "active_time",
+  "idle_time"
+ ],
+ "fields": [
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "User",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "session_id",
+   "fieldtype": "Data",
+   "label": "Session ID"
+  },
+  {
+   "fieldname": "route",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Route",
+   "length": 140
+  },
+  {
+   "fieldname": "view_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "View Type",
+   "options": "\nForm\nList\nReport\nWorkspace\nPage"
+  },
+  {
+   "fieldname": "ref_doctype",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "DocType",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "docname",
+   "fieldtype": "Data",
+   "label": "Document Name",
+   "length": 140
+  },
+  {
+   "fieldname": "active_time",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Active Time (s)"
+  },
+  {
+   "fieldname": "idle_time",
+   "fieldtype": "Int",
+   "label": "Idle Time (s)"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2024-01-01 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Activity Tracker",
+ "name": "User Activity Log",
+ "naming_rule": "Random",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 0,
+   "export": 1,
+   "print": 0,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 0,
+   "write": 0
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 0,
+   "export": 0,
+   "print": 0,
+   "read": 1,
+   "report": 0,
+   "role": "All",
+   "share": 0,
+   "write": 0,
+   "if_owner": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 0
+}
