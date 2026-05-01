@@ -34,7 +34,6 @@ def _doc(owner=None):
 class TestHasPermission(unittest.TestCase):
 
     def setUp(self):
-        frappe.get_roles.reset_mock()
         frappe.get_roles.return_value = []
 
     # -- Guest ----------------------------------------------------------------

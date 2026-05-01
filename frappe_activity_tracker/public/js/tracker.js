@@ -295,19 +295,33 @@
 	    frappe.after_ajax(function () {
 	        try {
 	            if (!frappe.session || !frappe.session.user) return;
-	
+
+	            // Guard frappe.utils.slug and frappe.router.slug against null/undefined
+	            // workspace names (Frappe v15 workspace sidebar compat).
+	            function patchSlug(obj, key) {
+	                if (obj && typeof obj[key] === "function") {
+	                    var _orig = obj[key];
+	                    obj[key] = function (name) {
+	                        if (!name) return "";
+	                        return _orig.call(this, name);
+	                    };
+	                }
+	            }
+	            patchSlug(frappe.utils, "slug");
+	            patchSlug(frappe.router, "slug");
+
 	            // ensure router exists
 	            if (frappe.router && frappe.router.on) {
 	                frappe.router.on("change", function () {
 	                    onRouteChange();
 	                });
 	            }
-	
+
 	            // run once safely
 	            if (typeof onRouteChange === "function") {
 	                onRouteChange();
 	            }
-	
+
 	        } catch (error) {
 	            console.error("Activity Tracker Error:", error);
 	        }
