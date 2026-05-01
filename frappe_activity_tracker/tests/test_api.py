@@ -38,9 +38,7 @@ def _reset_frappe_defaults():
     """Restore the frappe mock to a known state between tests."""
     frappe.session.user = "test@example.com"
     frappe.session.sid = "testsession123"
-    frappe.get_roles.reset_mock()
     frappe.get_roles.return_value = []
-    frappe.has_role.reset_mock()
     frappe.has_role.return_value = False
     frappe.db.bulk_insert.reset_mock()
     frappe.db.bulk_insert.side_effect = None
