@@ -9,6 +9,12 @@ app_license = "MIT"
 app_version = "0.0.1"
 
 # ---------------------------------------------------------------------------
+# Lifecycle hooks
+# ---------------------------------------------------------------------------
+after_install = "frappe_activity_tracker.install.after_install"
+before_uninstall = "frappe_activity_tracker.install.before_uninstall"
+
+# ---------------------------------------------------------------------------
 # Modules
 # ---------------------------------------------------------------------------
 app_include_js = ["frappe_activity_tracker/js/tracker.js"]
