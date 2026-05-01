@@ -78,3 +78,75 @@ def track_time(logs: str | list) -> dict:
 		frappe.db.commit()
 
 	return {"inserted": len(rows), "skipped": len(logs) - len(rows)}
+
+
+@frappe.whitelist()
+def track_button_click(logs: str | list) -> dict:
+	"""
+	Accept a JSON-serialised array of button click entries and bulk-insert
+	them into *Button Click Log*.
+
+	Each entry must contain::
+
+		{
+		    "label":       "Save",
+		    "button_type": "primary",
+		    "action_type": "save",
+		    "view_type":   "Form",
+		    "ref_doctype": "Sales Invoice",  # optional
+		    "docname":     "SI-0001",         # optional
+		    "route":       "/Form/Sales Invoice/SI-0001"
+		}
+
+	The server-side ``session_id`` and ``user`` are injected automatically so
+	the client cannot spoof them.
+	"""
+	if isinstance(logs, str):
+		try:
+			logs = json.loads(logs)
+		except json.JSONDecodeError:
+			frappe.throw(_("Invalid JSON payload"), frappe.ValidationError)
+
+	if not isinstance(logs, list):
+		frappe.throw(_("Payload must be a JSON array"), frappe.ValidationError)
+
+	user = frappe.session.user
+	session_id = frappe.session.sid
+	now = now_datetime()
+
+	rows = []
+	for entry in logs:
+		label = (entry.get("label") or "").strip()
+		if not label:
+			continue  # skip entries with no label
+
+		rows.append(
+			{
+				"name": frappe.generate_hash(length=10),
+				"user": user,
+				"session_id": session_id,
+				"label": label[:140],
+				"button_type": (entry.get("button_type") or "")[:50],
+				"action_type": (entry.get("action_type") or "")[:50],
+				"view_type": (entry.get("view_type") or "")[:50],
+				"ref_doctype": entry.get("ref_doctype") or None,
+				"docname": (entry.get("docname") or "")[:140],
+				"route": (entry.get("route") or "")[:140],
+				"creation": now,
+				"modified": now,
+				"modified_by": user,
+				"owner": user,
+				"docstatus": 0,
+			}
+		)
+
+	if rows:
+		frappe.db.bulk_insert(
+			"Button Click Log",
+			fields=list(rows[0].keys()),
+			values=[list(r.values()) for r in rows],
+			ignore_duplicates=True,
+		)
+		frappe.db.commit()
+
+	return {"inserted": len(rows), "skipped": len(logs) - len(rows)}
