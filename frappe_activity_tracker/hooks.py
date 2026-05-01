@@ -23,15 +23,28 @@ app_include_js = ["frappe_activity_tracker/js/tracker.js"]
 # Scheduler
 # ---------------------------------------------------------------------------
 scheduler_events = {
-	"daily": [
-		"frappe_activity_tracker.tasks.compute_productivity_summary",
-		"frappe_activity_tracker.tasks.generate_timesheet_logs",
-	]
+"daily": [
+"frappe_activity_tracker.tasks.compute_productivity_summary",
+"frappe_activity_tracker.tasks.generate_timesheet_logs",
+]
 }
 
 # ---------------------------------------------------------------------------
-# Permissions
+# Fixtures – ship Role definition with the app
 # ---------------------------------------------------------------------------
-# has_permission = {
-# 	"User Activity Log": "frappe_activity_tracker.permissions.has_permission"
-# }
+fixtures = [
+{
+"doctype": "Role",
+"filters": [["role_name", "=", "Activity Tracker Viewer"]],
+}
+]
+
+# ---------------------------------------------------------------------------
+# Permissions – backend-enforced access control
+# ---------------------------------------------------------------------------
+has_permission = {
+"User Activity Log": "frappe_activity_tracker.permissions.has_permission",
+"Button Click Log": "frappe_activity_tracker.permissions.has_permission",
+"Productivity Summary": "frappe_activity_tracker.permissions.has_permission",
+"Timesheet Auto Log": "frappe_activity_tracker.permissions.has_permission",
+}

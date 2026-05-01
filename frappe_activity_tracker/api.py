@@ -1,10 +1,11 @@
 from __future__ import unicode_literals
 
+import datetime
 import json
 
 import frappe
 from frappe import _
-from frappe.utils import now_datetime
+from frappe.utils import getdate, now_datetime, today
 
 from frappe_activity_tracker.install import APP_DOCTYPES
 
@@ -13,6 +14,25 @@ MIN_ACTIVE_SECONDS = 10
 
 # Maximum number of entries accepted in a single batch call
 MAX_BATCH_ENTRIES = 200
+
+_VIEWER_ROLES = frozenset(["Activity Tracker Viewer", "System Manager"])
+
+
+def _require_viewer_role():
+	"""Raise PermissionError if the current user lacks the dashboard viewer role."""
+	user = frappe.session.user
+	if user == "Guest":
+		frappe.throw(_("Not permitted"), frappe.PermissionError)
+	user_roles = set(frappe.get_roles(user))
+	if not (_VIEWER_ROLES & user_roles):
+		frappe.throw(
+			_(
+				"You do not have permission to access Activity Tracker dashboards. "
+				"Please contact your administrator to be assigned the "
+				"'Activity Tracker Viewer' role."
+			),
+			frappe.PermissionError,
+		)
 
 
 @frappe.whitelist()
@@ -167,6 +187,240 @@ def track_button_click(logs: str | list) -> dict:
 		frappe.db.commit()
 
 	return {"inserted": len(rows), "skipped": len(logs) - len(rows)}
+
+
+# ---------------------------------------------------------------------------
+# Dashboard API – require Activity Tracker Viewer role
+# ---------------------------------------------------------------------------
+
+
+@frappe.whitelist()
+def get_org_overview() -> dict:
+	"""
+	Return organisation-level KPI summary for the Activity Tracker Dashboard.
+
+	Requires: Activity Tracker Viewer role.
+	"""
+	_require_viewer_role()
+
+	today_str = today()
+
+	active_users_today = frappe.db.sql(
+		"""
+		SELECT COUNT(DISTINCT `user`) AS cnt
+		FROM `tabUser Activity Log`
+		WHERE DATE(`creation`) = %(today)s
+		""",
+		{"today": today_str},
+		as_dict=True,
+	)
+
+	productivity_avg = frappe.db.sql(
+		"""
+		SELECT ROUND(AVG(`productivity_score`), 2) AS avg_score
+		FROM `tabProductivity Summary`
+		WHERE `date` = %(today)s
+		""",
+		{"today": today_str},
+		as_dict=True,
+	)
+
+	total_active_seconds = frappe.db.sql(
+		"""
+		SELECT SUM(`active_time`) AS total
+		FROM `tabUser Activity Log`
+		WHERE DATE(`creation`) = %(today)s
+		""",
+		{"today": today_str},
+		as_dict=True,
+	)
+
+	top_users = frappe.db.sql(
+		"""
+		SELECT `user`, SUM(`active_time`) AS active_time,
+		       ROUND(SUM(`active_time`) / 3600, 2) AS active_hours
+		FROM `tabUser Activity Log`
+		WHERE DATE(`creation`) = %(today)s
+		GROUP BY `user`
+		ORDER BY active_time DESC
+		LIMIT 5
+		""",
+		{"today": today_str},
+		as_dict=True,
+	)
+
+	least_active = frappe.db.sql(
+		"""
+		SELECT `user`, SUM(`active_time`) AS active_time,
+		       ROUND(SUM(`active_time`) / 3600, 2) AS active_hours
+		FROM `tabUser Activity Log`
+		WHERE DATE(`creation`) = %(today)s
+		GROUP BY `user`
+		ORDER BY active_time ASC
+		LIMIT 5
+		""",
+		{"today": today_str},
+		as_dict=True,
+	)
+
+	doctype_distribution = frappe.db.sql(
+		"""
+		SELECT COALESCE(`ref_doctype`, 'Unknown') AS ref_doctype,
+		       SUM(`active_time`) AS active_time,
+		       ROUND(SUM(`active_time`) / 3600, 2) AS active_hours
+		FROM `tabUser Activity Log`
+		WHERE DATE(`creation`) = %(today)s
+		  AND `ref_doctype` IS NOT NULL AND `ref_doctype` != ''
+		GROUP BY `ref_doctype`
+		ORDER BY active_time DESC
+		LIMIT 10
+		""",
+		{"today": today_str},
+		as_dict=True,
+	)
+
+	return {
+		"active_users_today": (active_users_today[0].cnt or 0) if active_users_today else 0,
+		"avg_productivity_score": (productivity_avg[0].avg_score or 0.0) if productivity_avg else 0.0,
+		"total_active_seconds": (total_active_seconds[0].total or 0) if total_active_seconds else 0,
+		"total_active_hours": round(
+			((total_active_seconds[0].total or 0) if total_active_seconds else 0) / 3600, 2
+		),
+		"top_active_users": top_users,
+		"least_active_users": least_active,
+		"doctype_distribution": doctype_distribution,
+	}
+
+
+@frappe.whitelist()
+def get_user_dashboard(user: str = None, period: str = "today") -> dict:
+	"""
+	Return per-user productivity dashboard data.
+
+	Parameters
+	----------
+	user   : target user email; defaults to frappe.session.user
+	period : "today" | "week" | "month"
+
+	Requires: Activity Tracker Viewer role (or the user viewing their own data).
+	"""
+	current_user = frappe.session.user
+	target_user = user or current_user
+
+	# Users can see their own data; Activity Tracker Viewer can see all
+	if target_user != current_user:
+		_require_viewer_role()
+	elif current_user == "Guest":
+		frappe.throw(_("Not permitted"), frappe.PermissionError)
+
+	today_str = today()
+	if period == "week":
+		from_date = str(getdate(today_str) - datetime.timedelta(days=7))
+	elif period == "month":
+		from_date = str(getdate(today_str) - datetime.timedelta(days=30))
+	else:
+		from_date = today_str
+
+	activity_summary = frappe.db.sql(
+		"""
+		SELECT
+			SUM(`active_time`)  AS total_active_time,
+			SUM(`idle_time`)    AS total_idle_time,
+			COUNT(*)            AS sessions,
+			ROUND(SUM(`active_time`) / 3600, 2) AS active_hours,
+			ROUND(
+				SUM(`active_time`) /
+				NULLIF(SUM(`active_time`) + SUM(`idle_time`), 0) * 100
+			, 2) AS productivity_score
+		FROM `tabUser Activity Log`
+		WHERE `user` = %(user)s
+		  AND DATE(`creation`) BETWEEN %(from_date)s AND %(today)s
+		""",
+		{"user": target_user, "from_date": from_date, "today": today_str},
+		as_dict=True,
+	)
+
+	pages_visited = frappe.db.sql(
+		"""
+		SELECT `route`, `view_type`, SUM(`active_time`) AS active_time,
+		       COUNT(*) AS visits
+		FROM `tabUser Activity Log`
+		WHERE `user` = %(user)s
+		  AND DATE(`creation`) BETWEEN %(from_date)s AND %(today)s
+		GROUP BY `route`, `view_type`
+		ORDER BY active_time DESC
+		LIMIT 20
+		""",
+		{"user": target_user, "from_date": from_date, "today": today_str},
+		as_dict=True,
+	)
+
+	doctypes_accessed = frappe.db.sql(
+		"""
+		SELECT COALESCE(`ref_doctype`, 'Unknown') AS ref_doctype,
+		       SUM(`active_time`) AS active_time,
+		       COUNT(*) AS sessions
+		FROM `tabUser Activity Log`
+		WHERE `user` = %(user)s
+		  AND DATE(`creation`) BETWEEN %(from_date)s AND %(today)s
+		  AND `ref_doctype` IS NOT NULL AND `ref_doctype` != ''
+		GROUP BY `ref_doctype`
+		ORDER BY active_time DESC
+		LIMIT 10
+		""",
+		{"user": target_user, "from_date": from_date, "today": today_str},
+		as_dict=True,
+	)
+
+	button_interactions = frappe.db.sql(
+		"""
+		SELECT COUNT(*) AS total_clicks,
+		       COUNT(DISTINCT `label`) AS unique_buttons
+		FROM `tabButton Click Log`
+		WHERE `user` = %(user)s
+		  AND DATE(`creation`) BETWEEN %(from_date)s AND %(today)s
+		""",
+		{"user": target_user, "from_date": from_date, "today": today_str},
+		as_dict=True,
+	)
+
+	session_history = frappe.db.sql(
+		"""
+		SELECT DATE(`creation`) AS date,
+		       SUM(`active_time`) AS active_time,
+		       SUM(`idle_time`) AS idle_time,
+		       COUNT(*) AS sessions,
+		       ROUND(
+		           SUM(`active_time`) /
+		           NULLIF(SUM(`active_time`) + SUM(`idle_time`), 0) * 100
+		       , 2) AS productivity_score
+		FROM `tabUser Activity Log`
+		WHERE `user` = %(user)s
+		  AND DATE(`creation`) BETWEEN %(from_date)s AND %(today)s
+		GROUP BY DATE(`creation`)
+		ORDER BY date DESC
+		""",
+		{"user": target_user, "from_date": from_date, "today": today_str},
+		as_dict=True,
+	)
+
+	summary = activity_summary[0] if activity_summary else {}
+	clicks = button_interactions[0] if button_interactions else {}
+
+	return {
+		"user": target_user,
+		"period": period,
+		"total_active_time": summary.get("total_active_time") or 0,
+		"total_idle_time": summary.get("total_idle_time") or 0,
+		"active_hours": summary.get("active_hours") or 0.0,
+		"sessions": summary.get("sessions") or 0,
+		"productivity_score": summary.get("productivity_score") or 0.0,
+		"total_button_clicks": clicks.get("total_clicks") or 0,
+		"unique_buttons_used": clicks.get("unique_buttons") or 0,
+		"pages_visited": pages_visited,
+		"doctypes_accessed": doctypes_accessed,
+		"session_history": session_history,
+	}
 
 
 # ---------------------------------------------------------------------------
