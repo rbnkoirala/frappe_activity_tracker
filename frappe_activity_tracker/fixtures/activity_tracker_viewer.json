@@ -1,6 +1,7 @@
 [
   {
     "doctype": "Role",
+    "name": "Activity Tracker Viewer",
     "role_name": "Activity Tracker Viewer",
     "desk_access": 1,
     "is_custom": 1,
