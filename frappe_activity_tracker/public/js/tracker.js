@@ -292,15 +292,26 @@
 
 	// Hook into Frappe router and capture the initial route once Frappe is ready
 	if (typeof frappe !== "undefined") {
-		frappe.after_ajax(function () {
-			try {
-				if (!frappe.session || !frappe.session.user) return;
-				frappe.router.on("change", onRouteChange);
-				onRouteChange();
-			} catch (error) {
-				console.error("Activity Tracker Error:", error);
-			}
-		});
+	    frappe.after_ajax(function () {
+	        try {
+	            if (!frappe.session || !frappe.session.user) return;
+	
+	            // ensure router exists
+	            if (frappe.router && frappe.router.on) {
+	                frappe.router.on("change", function () {
+	                    onRouteChange();
+	                });
+	            }
+	
+	            // run once safely
+	            if (typeof onRouteChange === "function") {
+	                onRouteChange();
+	            }
+	
+	        } catch (error) {
+	            console.error("Activity Tracker Error:", error);
+	        }
+	    });
 	}
 
 	/* ------------------------------------------------------------------ */
