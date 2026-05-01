@@ -1,0 +1,178 @@
+{
+ "charts": [
+  {"chart_name": "Active Time Trend"},
+  {"chart_name": "Doctype Usage Distribution"},
+  {"chart_name": "User Activity Distribution"}
+ ],
+ "content": "[{\"id\":\"ws-hdr-1\",\"type\":\"header\",\"data\":{\"text\":\"\\ud83d\\udcca Organization Overview\",\"col\":12}},{\"id\":\"ws-nc-1\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Users Today\",\"col\":4}},{\"id\":\"ws-nc-2\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Avg Productivity Score\",\"col\":4}},{\"id\":\"ws-nc-3\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Active Hours Today\",\"col\":4}},{\"id\":\"ws-ch-1\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Active Time Trend\",\"col\":6}},{\"id\":\"ws-ch-2\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Doctype Usage Distribution\",\"col\":6}},{\"id\":\"ws-ch-3\",\"type\":\"chart\",\"data\":{\"chart_name\":\"User Activity Distribution\",\"col\":12}},{\"id\":\"ws-spc-1\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"ws-hdr-2\",\"type\":\"header\",\"data\":{\"text\":\"\\ud83d\\udc64 User Performance\",\"col\":12}},{\"id\":\"ws-sc-1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Org Active Users Today\",\"col\":3}},{\"id\":\"ws-sc-2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Productivity Score Per User\",\"col\":3}},{\"id\":\"ws-sc-3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Time Per User\",\"col\":3}},{\"id\":\"ws-sc-4\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"User Idle Active Breakdown\",\"col\":3}},{\"id\":\"ws-sc-5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"User Activity Timeline\",\"col\":3}},{\"id\":\"ws-spc-2\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"ws-hdr-3\",\"type\":\"header\",\"data\":{\"text\":\"\\ud83d\\udcc4 Workload & Pending Analysis\",\"col\":12}},{\"id\":\"ws-sc-6\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Daily Work Hours\",\"col\":3}},{\"id\":\"ws-sc-7\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Time Per Doctype\",\"col\":3}},{\"id\":\"ws-sc-8\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Time Per Report\",\"col\":3}},{\"id\":\"ws-sc-9\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Timesheet Auto Log\",\"col\":3}},{\"id\":\"ws-spc-3\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"ws-hdr-4\",\"type\":\"header\",\"data\":{\"text\":\"\\ud83d\\udd25 Interaction Analytics\",\"col\":12}},{\"id\":\"ws-sc-10\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"User Button Click Frequency\",\"col\":3}},{\"id\":\"ws-sc-11\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Most Used Buttons\",\"col\":3}},{\"id\":\"ws-sc-12\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Most Clicked Actions\",\"col\":3}},{\"id\":\"ws-sc-13\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Actions Per Doctype\",\"col\":3}},{\"id\":\"ws-sc-14\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"System Usage Heatmap\",\"col\":3}},{\"id\":\"ws-sc-15\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"User Interaction Count\",\"col\":3}},{\"id\":\"ws-spc-4\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"ws-hdr-5\",\"type\":\"header\",\"data\":{\"text\":\"\\ud83d\\udcca Quick Access\",\"col\":12}},{\"id\":\"ws-sc-16\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"User Activity Log\",\"col\":3}},{\"id\":\"ws-sc-17\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Button Click Log\",\"col\":3}},{\"id\":\"ws-sc-18\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Productivity Summary\",\"col\":3}}]",
+ "creation": "2024-01-01 00:00:00.000000",
+ "doctype": "Workspace",
+ "for_user": "",
+ "icon": "bar-chart",
+ "is_hidden": 0,
+ "label": "Activity Tracker Dashboard",
+ "modified": "2024-01-01 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Activity Tracker",
+ "name": "Activity Tracker Dashboard",
+ "number_cards": [
+  {"number_card_name": "Active Users Today"},
+  {"number_card_name": "Avg Productivity Score"},
+  {"number_card_name": "Total Active Hours Today"}
+ ],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "restrict_to_domain": "",
+ "roles": [
+  {"role": "Activity Tracker Viewer"},
+  {"role": "System Manager"}
+ ],
+ "sequence_id": 999.0,
+ "shortcuts": [
+  {
+   "color": "Blue",
+   "format": "Report",
+   "icon": "users",
+   "label": "Org Active Users Today",
+   "link_to": "Org Active Users Today",
+   "type": "Report"
+  },
+  {
+   "color": "Green",
+   "format": "Report",
+   "icon": "trending-up",
+   "label": "Productivity Score Per User",
+   "link_to": "Productivity Score Per User",
+   "type": "Report"
+  },
+  {
+   "color": "Blue",
+   "format": "Report",
+   "icon": "clock",
+   "label": "Time Per User",
+   "link_to": "Time Per User",
+   "type": "Report"
+  },
+  {
+   "color": "Orange",
+   "format": "Report",
+   "icon": "activity",
+   "label": "User Idle Active Breakdown",
+   "link_to": "User Idle Active Breakdown",
+   "type": "Report"
+  },
+  {
+   "color": "Purple",
+   "format": "Report",
+   "icon": "list",
+   "label": "User Activity Timeline",
+   "link_to": "User Activity Timeline",
+   "type": "Report"
+  },
+  {
+   "color": "Green",
+   "format": "Report",
+   "icon": "calendar",
+   "label": "Daily Work Hours",
+   "link_to": "Daily Work Hours",
+   "type": "Report"
+  },
+  {
+   "color": "Blue",
+   "format": "Report",
+   "icon": "layers",
+   "label": "Time Per Doctype",
+   "link_to": "Time Per Doctype",
+   "type": "Report"
+  },
+  {
+   "color": "Yellow",
+   "format": "Report",
+   "icon": "file-text",
+   "label": "Time Per Report",
+   "link_to": "Time Per Report",
+   "type": "Report"
+  },
+  {
+   "color": "Gray",
+   "format": "List",
+   "icon": "clock",
+   "label": "Timesheet Auto Log",
+   "link_to": "Timesheet Auto Log",
+   "type": "DocType"
+  },
+  {
+   "color": "Red",
+   "format": "Report",
+   "icon": "mouse-pointer",
+   "label": "User Button Click Frequency",
+   "link_to": "User Button Click Frequency",
+   "type": "Report"
+  },
+  {
+   "color": "Orange",
+   "format": "Report",
+   "icon": "zap",
+   "label": "Most Used Buttons",
+   "link_to": "Most Used Buttons",
+   "type": "Report"
+  },
+  {
+   "color": "Red",
+   "format": "Report",
+   "icon": "play-circle",
+   "label": "Most Clicked Actions",
+   "link_to": "Most Clicked Actions",
+   "type": "Report"
+  },
+  {
+   "color": "Blue",
+   "format": "Report",
+   "icon": "pie-chart",
+   "label": "Actions Per Doctype",
+   "link_to": "Actions Per Doctype",
+   "type": "Report"
+  },
+  {
+   "color": "Purple",
+   "format": "Report",
+   "icon": "grid",
+   "label": "System Usage Heatmap",
+   "link_to": "System Usage Heatmap",
+   "type": "Report"
+  },
+  {
+   "color": "Gray",
+   "format": "Report",
+   "icon": "bar-chart-2",
+   "label": "User Interaction Count",
+   "link_to": "User Interaction Count",
+   "type": "Report"
+  },
+  {
+   "color": "Blue",
+   "format": "List",
+   "icon": "activity",
+   "label": "User Activity Log",
+   "link_to": "User Activity Log",
+   "type": "DocType"
+  },
+  {
+   "color": "Orange",
+   "format": "List",
+   "icon": "mouse-pointer",
+   "label": "Button Click Log",
+   "link_to": "Button Click Log",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "format": "List",
+   "icon": "award",
+   "label": "Productivity Summary",
+   "link_to": "Productivity Summary",
+   "type": "DocType"
+  }
+ ]
+}

@@ -9,16 +9,12 @@
  "modified": "2024-01-01 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Frappe Activity Tracker",
- "name": "Daily Work Hours",
+ "name": "User Idle Active Breakdown",
  "owner": "Administrator",
- "ref_doctype": "Timesheet Auto Log",
+ "ref_doctype": "User Activity Log",
  "report_type": "Script Report",
  "roles": [
-  {
-   "role": "System Manager"
-  },
-  {
-   "role": "Activity Tracker Viewer"
-  }
+  {"role": "System Manager"},
+  {"role": "Activity Tracker Viewer"}
  ]
 }
