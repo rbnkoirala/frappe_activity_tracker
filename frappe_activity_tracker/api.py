@@ -9,6 +9,9 @@ from frappe.utils import now_datetime
 # Minimum active time (seconds) to be worth recording
 MIN_ACTIVE_SECONDS = 10
 
+# Maximum number of entries accepted in a single batch call
+MAX_BATCH_ENTRIES = 200
+
 
 @frappe.whitelist()
 def track_time(logs: str | list) -> dict:
@@ -38,6 +41,12 @@ def track_time(logs: str | list) -> dict:
 
 	if not isinstance(logs, list):
 		frappe.throw(_("Payload must be a JSON array"), frappe.ValidationError)
+
+	if len(logs) > MAX_BATCH_ENTRIES:
+		frappe.throw(
+			_("Batch too large: maximum {0} entries per call").format(MAX_BATCH_ENTRIES),
+			frappe.ValidationError,
+		)
 
 	user = frappe.session.user
 	session_id = frappe.session.sid
@@ -109,6 +118,12 @@ def track_button_click(logs: str | list) -> dict:
 
 	if not isinstance(logs, list):
 		frappe.throw(_("Payload must be a JSON array"), frappe.ValidationError)
+
+	if len(logs) > MAX_BATCH_ENTRIES:
+		frappe.throw(
+			_("Batch too large: maximum {0} entries per call").format(MAX_BATCH_ENTRIES),
+			frappe.ValidationError,
+		)
 
 	user = frappe.session.user
 	session_id = frappe.session.sid
