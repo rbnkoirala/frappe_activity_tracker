@@ -277,6 +277,7 @@
 	function onRouteChange() {
 		try {
 			if (!isLeader()) return;
+			if (!frappe.session || !frappe.session.user) return;
 			const routeArr = (frappe.get_route ? frappe.get_route() : []) || [];
 			startNewSegment(routeArr);
 			// Flush pending clicks from the previous route in idle time
@@ -284,16 +285,23 @@
 				processPendingClicks();
 				sendClickBatch(1);
 			});
-		} catch (_) {}
+		} catch (error) {
+			console.error("Activity Tracker Error:", error);
+		}
 	}
 
-	// Hook into Frappe router
-	frappe.router.on("change", onRouteChange);
-
-	// Capture the initial route once Frappe is ready
-	frappe.ready(function () {
-		onRouteChange();
-	});
+	// Hook into Frappe router and capture the initial route once Frappe is ready
+	if (typeof frappe !== "undefined") {
+		frappe.after_ajax(function () {
+			try {
+				if (!frappe.session || !frappe.session.user) return;
+				frappe.router.on("change", onRouteChange);
+				onRouteChange();
+			} catch (error) {
+				console.error("Activity Tracker Error:", error);
+			}
+		});
+	}
 
 	/* ------------------------------------------------------------------ */
 	/* Batch flush – time logs                                              */
@@ -391,7 +399,7 @@
 	 * Determine view_type, ref_doctype, docname, and route from current Frappe state.
 	 */
 	function getClickContext() {
-		const routeArr = (frappe.get_route ? frappe.get_route() : []) || [];
+		const routeArr = (typeof frappe !== "undefined" && frappe.get_route ? frappe.get_route() : []) || [];
 		const { viewType, doctype, docname } = parseRoute(routeArr);
 		return {
 			view_type:   viewType,
