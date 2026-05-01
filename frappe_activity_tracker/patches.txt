@@ -1,0 +1,1 @@
+frappe_activity_tracker.patches.add_indexes_to_user_activity_log

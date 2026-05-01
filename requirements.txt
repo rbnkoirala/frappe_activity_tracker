@@ -1,0 +1,2 @@
+# Frappe is a peer dependency – listed here for documentation purposes only
+# frappe>=15.0.0

@@ -1,0 +1,9 @@
+[project]
+name = "frappe_activity_tracker"
+version = "0.0.1"
+description = "Tracks user activity inside Frappe Desk and provides productivity analytics"
+requires-python = ">=3.10"
+
+[build-system]
+requires = ["flit_core >=3.4,<4"]
+build-backend = "flit_core.buildapi"
