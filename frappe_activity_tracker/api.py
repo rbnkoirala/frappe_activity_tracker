@@ -7,6 +7,8 @@ import frappe
 from frappe import _
 from frappe.utils import getdate, now_datetime, today
 
+from frappe_activity_tracker.install import APP_DOCTYPES
+
 # Minimum active time (seconds) to be worth recording
 MIN_ACTIVE_SECONDS = 10
 
@@ -419,3 +421,49 @@ def get_user_dashboard(user: str = None, period: str = "today") -> dict:
 		"doctypes_accessed": doctypes_accessed,
 		"session_history": session_history,
 	}
+
+
+# ---------------------------------------------------------------------------
+# App reset
+# ---------------------------------------------------------------------------
+
+@frappe.whitelist()
+def reset_app() -> dict:
+	"""
+	Delete all activity logs, button click logs, productivity summaries, and
+	timesheet auto logs without uninstalling the app.
+
+	Only System Managers may call this endpoint.
+
+	Usage::
+
+	    frappe.call("frappe_activity_tracker.api.reset_app")
+
+	Equivalent CLI::
+
+	    bench --site [site] execute frappe_activity_tracker.install.reset_all
+	"""
+	if frappe.session.user == "Guest":
+		frappe.throw(_("Not permitted"), frappe.PermissionError)
+
+	if not frappe.has_role("System Manager"):
+		frappe.throw(_("Only System Managers can reset the Activity Tracker"), frappe.PermissionError)
+
+	deleted: dict[str, int] = {}
+	for doctype in APP_DOCTYPES:
+		try:
+			count = frappe.db.count(doctype)
+			frappe.db.delete(doctype)
+			frappe.db.commit()
+			deleted[doctype] = count
+			frappe.logger().info(
+				f"[frappe_activity_tracker] reset_app: deleted {count} row(s) from '{doctype}'"
+			)
+		except Exception:
+			frappe.logger().warning(
+				f"[frappe_activity_tracker] reset_app: could not delete data from '{doctype}'",
+				exc_info=True,
+			)
+			deleted[doctype] = -1
+
+	return {"status": "ok", "deleted": deleted}
