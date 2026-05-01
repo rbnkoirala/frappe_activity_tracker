@@ -17,7 +17,7 @@ before_uninstall = "frappe_activity_tracker.install.before_uninstall"
 # ---------------------------------------------------------------------------
 # Modules
 # ---------------------------------------------------------------------------
-app_include_js = ["frappe_activity_tracker/js/tracker.js"]
+app_include_js = ["/assets/frappe_activity_tracker/js/tracker.js"]
 
 # ---------------------------------------------------------------------------
 # Scheduler
