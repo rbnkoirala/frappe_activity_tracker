@@ -48,12 +48,22 @@ frappe_activity_tracker/
 
 ## Installation
 
+### Prerequisites
+
+- Frappe bench set up with a site (v15+ recommended)
+- Python 3.10+
+
+### Installation Process
+
 ```bash
 # From your bench directory
 bench get-app https://github.com/rbnkoirala/frappe_activity_tracker
 bench --site <your-site> install-app frappe_activity_tracker
 bench --site <your-site> migrate
+bench --site <your-site> enable-scheduler
 ```
+
+Ensure your bench workers are running so the daily scheduler jobs execute.
 
 ---
 
